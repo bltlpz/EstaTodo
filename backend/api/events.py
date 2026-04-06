@@ -20,7 +20,8 @@ class DisputeResponse(BaseModel):
     event_id: str
     hash_sha256: str | None
     blockchain_tx: str | None
-    genlayer_verdict: str
+    vision_verdict: str
+    genlayer_verdict: str  # alias de compatibilidad
     dispute_status: str
     incident_description: str | None = None
     ipfs_cid: str | None = None
@@ -119,22 +120,24 @@ async def create_dispute(event_id: str) -> DisputeResponse:
                 f"El evento ocurrió el {ts_str} durante un viaje en curso. "
                 f"Nivel de riesgo estimado: {'ALTO' if (ev.confidence or 0) > 0.7 else 'MEDIO'}."
             )
-            if ev.ipfs_cid:
-                description += f" Video en IPFS: ipfs://{ev.ipfs_cid}"
 
-        from integrations.genlayer_client import genlayer_client
-        logger.info("[INFO] Solicitando veredicto a Genlayer (via descripción textual + CID)...")
+        # Obtener key frames guardados en metadata (generados al ingestar el clip)
+        key_frames: list[str] = (ev.event_metadata or {}).get("key_frames", [])
 
-        verdict = await genlayer_client.request_verdict(
-            hash_sha256=ev.hash_sha256,
-            incident_description=description,
+        from integrations.claude_vision_client import claude_vision_client
+        logger.info("[INFO] Enviando frames a Claude Vision para análisis...")
+
+        result = await claude_vision_client.analyze_frames(
+            frame_paths=key_frames,
             event_type=ev.type,
-            ipfs_cid=ev.ipfs_cid or "",
         )
 
-        logger.info(f"[INFO] Veredicto recibido: {verdict}")
+        verdict = result.get("verdict", "REQUIERE_REVISION")
+        description = result.get("description", "")
+        logger.info(f"[INFO] Veredicto Claude Vision: {verdict}")
 
-        ev.genlayer_verdict = verdict
+        ev.genlayer_verdict = verdict          # columna DB reutilizada
+        ev.incident_description = description  # descripción generada por Claude
         session.add(ev)
         await session.commit()
         await session.refresh(ev)
@@ -143,7 +146,8 @@ async def create_dispute(event_id: str) -> DisputeResponse:
             event_id=str(ev.id),
             hash_sha256=str(ev.hash_sha256),
             blockchain_tx=str(ev.blockchain_tx) if ev.blockchain_tx else None,
-            genlayer_verdict=verdict,
+            vision_verdict=verdict,
+            genlayer_verdict=verdict,  # alias de compatibilidad con el frontend
             dispute_status="resolved",
             incident_description=description,
             ipfs_cid=ev.ipfs_cid,
@@ -175,7 +179,7 @@ async def seed_demo_endpoint() -> dict[str, Any]:
             hash_sha256=hashlib.sha256(b"demo-robo-001").hexdigest(),
             blockchain_tx="0x" + "a3f8b2c1d4e5f6789012345678901234567890ab",
             blockchain_status=BlockchainStatus.CONFIRMED,
-            genlayer_verdict="ROBO_CONFIRMADO",
+            genlayer_verdict="CONFIRMADO",
             incident_description="Operario detectado manipulando pallets sin autorización dentro del trailer. Movimiento sospechoso hacia la salida trasera. Confianza: 89%.",
             module="CARGO",
             ipfs_cid="QmQdEmYyzTSx7akqhKAjhQKYpzoCicg682LWMF5U4f4Vnw",

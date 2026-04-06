@@ -36,9 +36,9 @@ interface VerdictMeta {
 }
 
 function getVerdictMeta(verdict: string | null): VerdictMeta {
-  if (verdict === 'ROBO_CONFIRMADO') return {
+  if (verdict === 'CONFIRMADO' || verdict === 'ROBO_CONFIRMADO') return {
     color: '#EF4444', bg: '#450a0a', borderColor: '#EF4444',
-    text: 'ROBO_CONFIRMADO', pill: '⚠ Incidente confirmado', icon: '⚠'
+    text: 'CONFIRMADO', pill: '⚠ Incidente confirmado', icon: '⚠'
   };
   if (verdict === 'FALSA_ALARMA') return {
     color: '#10B981', bg: '#052e16', borderColor: '#10B981',
@@ -126,7 +126,8 @@ function ExpandedEvent({ event, onClose }: { event: SGEvent; onClose: () => void
   const [techOpen, setTechOpen] = useState(false);
   const [custodyOpen, setCustodyOpen] = useState(false);
 
-  const v = getVerdictMeta(localEvent.genlayer_verdict);
+  const verdict = localEvent.vision_verdict ?? localEvent.genlayer_verdict ?? null;
+  const v = getVerdictMeta(verdict);
 
   const handleAnalyze = async () => {
     setAnalyzing(true);
@@ -134,7 +135,8 @@ function ExpandedEvent({ event, onClose }: { event: SGEvent; onClose: () => void
       const res = await fetch(`${API_URL}/api/events/${localEvent.id}/dispute`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
-        setLocalEvent(prev => ({ ...prev, genlayer_verdict: data.genlayer_verdict, blockchain_tx: data.blockchain_tx || prev.blockchain_tx }));
+        const newVerdict = data.vision_verdict || data.genlayer_verdict;
+        setLocalEvent(prev => ({ ...prev, vision_verdict: newVerdict, genlayer_verdict: newVerdict, incident_description: data.incident_description || prev.incident_description, blockchain_tx: data.blockchain_tx || prev.blockchain_tx }));
       }
     } catch { /* ignore */ } finally {
       setAnalyzing(false);
@@ -142,19 +144,19 @@ function ExpandedEvent({ event, onClose }: { event: SGEvent; onClose: () => void
   };
 
   const getBullets = () => {
-    if (localEvent.genlayer_verdict === 'ROBO_CONFIRMADO') return [
+    if (verdict === 'CONFIRMADO' || verdict === 'ROBO_CONFIRMADO') return [
       'Movimiento en zona restringida del trailer',
       'Operario sin autorización de despacho',
       'Comportamiento evasivo hacia salida trasera',
     ];
-    if (localEvent.genlayer_verdict === 'FALSA_ALARMA') return [
+    if (verdict === 'FALSA_ALARMA') return [
       'Revisión de inventario autorizada',
       'Operario dentro de su rol habitual',
       'Sin anomalías en ningún frame',
     ];
     return [
       'Movimiento detectado por YOLOv8',
-      'Análisis de Genlayer pendiente',
+      'Análisis de IA pendiente',
       'Evidencia preservada en blockchain',
     ];
   };
@@ -163,7 +165,7 @@ function ExpandedEvent({ event, onClose }: { event: SGEvent; onClose: () => void
     { icon: '📷', title: 'Detectado', subtitle: 'YOLOv8 · Edge AI', value: localEvent.timestamp ? new Date(localEvent.timestamp).toLocaleTimeString('es-AR') : '—', active: true, link: null },
     { icon: '🔒', title: 'Sellado', subtitle: 'SHA-256 calculado', value: localEvent.hash_sha256 ? localEvent.hash_sha256.slice(0, 10) + '...' : 'Pendiente', active: !!localEvent.hash_sha256, link: null },
     { icon: '🔗', title: 'On-chain', subtitle: 'Avalanche L1 · PoA', value: localEvent.blockchain_tx ? localEvent.blockchain_tx.slice(0, 10) + '...' : 'Pendiente', active: !!localEvent.blockchain_tx, link: null },
-    { icon: '⚖️', title: 'Veredicto', subtitle: 'Genlayer · 7 LLMs', value: localEvent.genlayer_verdict ? localEvent.genlayer_verdict.replace('_', ' ') : 'Pendiente', active: !!localEvent.genlayer_verdict, link: null },
+    { icon: '⚖️', title: 'Análisis IA', subtitle: 'Claude Vision', value: verdict ? verdict.replace('_', ' ') : 'Pendiente', active: !!verdict, link: null },
   ];
 
   return (
@@ -213,15 +215,15 @@ function ExpandedEvent({ event, onClose }: { event: SGEvent; onClose: () => void
               </span>
             </div>
             <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 8 }}>
-              {localEvent.genlayer_verdict === 'ROBO_CONFIRMADO' ? 'Consenso de 7 validadores · 89% confianza' : localEvent.genlayer_verdict === 'FALSA_ALARMA' ? 'Actividad normal verificada' : 'Esperando validadores...'}
+              {(verdict === 'CONFIRMADO' || verdict === 'ROBO_CONFIRMADO') ? 'Incidente confirmado por Claude Vision · Evidencia sellada' : verdict === 'FALSA_ALARMA' ? 'Actividad normal verificada por Claude Vision' : 'Esperando análisis de IA...'}
             </div>
-            {localEvent.genlayer_verdict ? (
+            {verdict ? (
               <span style={{ background: '#0c1a35', color: '#06B6D4', fontSize: 10, padding: '3px 8px', borderRadius: 4, border: '0.5px solid #06B6D430' }}>
-                Genlayer · LLM Consensus
+                Claude Vision · IA
               </span>
             ) : (
               <button onClick={handleAnalyze} disabled={analyzing} style={{ background: '#06B6D4', color: '#0F172A', fontWeight: 600, border: 'none', padding: '9px 14px', borderRadius: 6, cursor: 'pointer', width: '100%', marginTop: 8, fontSize: 13 }}>
-                {analyzing ? '⏳ Consultando 7 validadores...' : 'Consultar Genlayer →'}
+                {analyzing ? '⏳ Analizando frames con Claude...' : 'Analizar con IA →'}
               </button>
             )}
           </div>
@@ -243,7 +245,7 @@ function ExpandedEvent({ event, onClose }: { event: SGEvent; onClose: () => void
           </div>
 
           {/* Card 3 — Qué hacer (solo ROBO) */}
-          {localEvent.genlayer_verdict === 'ROBO_CONFIRMADO' && (
+          {(verdict === 'CONFIRMADO' || verdict === 'ROBO_CONFIRMADO') && (
             <div style={{ background: '#1E293B', borderRadius: 10, padding: '14px 16px', border: '0.5px solid #334155', borderLeft: '3px solid #F59E0B' }}>
               <div style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#64748B', marginBottom: 10 }}>QUÉ HACER</div>
               <CheckItem label="Notificar a la aseguradora" />
@@ -323,7 +325,7 @@ function ExpandedEvent({ event, onClose }: { event: SGEvent; onClose: () => void
 
 /* ─── EventListCard ────────────────────────────────────────────── */
 function EventListCard({ event, onExpand }: { event: SGEvent; onExpand: (e: SGEvent) => void }) {
-  const v = getVerdictMeta(event.genlayer_verdict);
+  const v = getVerdictMeta(event.vision_verdict ?? event.genlayer_verdict ?? null);
   const [hovered, setHovered] = useState(false);
 
   const leftColor = v.borderColor;
@@ -419,8 +421,8 @@ export default function EventsPage() {
 
   const filtered = merged.filter((ev) => {
     if (filter === 'incidents') return ev.type !== 'normal';
-    if (filter === 'fraude') return ev.genlayer_verdict?.includes('FRAUDE') || ev.genlayer_verdict?.includes('ROBO');
-    if (filter === 'sin_veredicto') return !ev.genlayer_verdict;
+    if (filter === 'fraude') return ev.vision_verdict?.includes('CONFIRMADO') || ev.genlayer_verdict?.includes('FRAUDE') || ev.genlayer_verdict?.includes('ROBO');
+    if (filter === 'sin_veredicto') return !ev.vision_verdict && !ev.genlayer_verdict;
     return true;
   });
 

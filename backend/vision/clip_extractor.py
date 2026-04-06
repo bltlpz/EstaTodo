@@ -1,6 +1,6 @@
 """
 Extrae un clip .mp4 del buffer circular de frames alrededor de un evento.
-Extrae también key frames para Genlayer.
+Extrae también key frames para Claude Vision.
 """
 
 from __future__ import annotations

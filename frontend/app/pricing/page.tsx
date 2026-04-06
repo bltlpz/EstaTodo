@@ -5,22 +5,27 @@ import { useRouter } from 'next/navigation';
 const FAQS = [
   {
     q: '¿Necesito comprar cámaras nuevas?',
-    a: 'No. EstaTodo se conecta a tus cámaras IP existentes via RTSP/ONVIF. Sin hardware adicional.',
+    a: 'No necesariamente. SafeGuard es compatible con cámaras IP existentes vía RTSP/ONVIF. Para nuevas instalaciones recomendamos la RPi Camera Module 3 Wide con cable flat directo a la Raspberry Pi (12MP, 120° gran angular).',
   },
   {
-    q: '¿Qué pasa si Genlayer detecta un falso positivo?',
-    a: 'El plan PyME solo cobra los $20 por disputa cuando el veredicto es ROBO_CONFIRMADO. Las falsas alarmas no se cobran.',
+    q: '¿Qué pasa si la IA detecta un falso positivo?',
+    a: 'Cada alerta puede analizarse con Claude Vision, que revisa los frames del video y emite un veredicto (CONFIRMADO / FALSA_ALARMA / REQUIERE_REVISIÓN). La evidencia original siempre queda sellada en blockchain.',
   },
   {
     q: '¿Mis videos se suben a internet?',
-    a: 'No. Los videos quedan en tu servidor local. Solo el hash matemático SHA-256 se registra en la blockchain, garantizando tu privacidad total.',
+    a: 'Los videos se suben a IPFS (red descentralizada) para garantizar la trazabilidad. Solo el hash SHA-256 se registra en la blockchain de Avalanche. El acceso al video requiere el CID de IPFS.',
+  },
+  {
+    q: '¿Cómo se paga? ¿en dólares o cripto?',
+    a: 'Totalmente en pesos argentinos (ARS) vía Mercado Pago. Sin conversiones, sin billeteras cripto, sin complicaciones. Tarjeta, transferencia o efectivo.',
   },
 ];
 
 const COMPARATIVE = [
   { feature: 'Cámaras', demo: '1 prueba', pyme: '5', pro: '20', enterprise: 'Ilimitadas' },
   { feature: 'Avalanche L1', demo: 'Testnet', pyme: '✓', pro: '✓', enterprise: 'Nodo propio' },
-  { feature: 'Genlayer', demo: '1 sim', pyme: '+$20 c/u', pro: '5 gratis', enterprise: 'Ilimitado' },
+  { feature: 'IPFS (video)', demo: '✓', pyme: '✓', pro: '✓', enterprise: '✓' },
+  { feature: 'Análisis Claude IA', demo: '1 sim', pyme: '3/mes', pro: '20/mes', enterprise: 'Ilimitado' },
   { feature: 'Retención datos', demo: '7 días', pyme: '30 días', pro: '90 días', enterprise: '1 año' },
   { feature: 'Live Map', demo: '✓', pyme: '✓', pro: '✓', enterprise: '✓' },
   { feature: 'Módulo logístico', demo: '✗', pyme: '✗', pro: '✓', enterprise: '✓' },
@@ -128,7 +133,7 @@ export default function PricingPage() {
               {[
                 '1 cámara de prueba',
                 '100 registros en Avalanche Testnet',
-                '1 peritaje simulado de Genlayer',
+                '1 análisis Claude Vision de muestra',
                 'Live Map con datos de prueba',
                 'Sin tarjeta de crédito'
               ].map(f => (
@@ -200,8 +205,8 @@ export default function PricingPage() {
               </p>
               
               <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                <span style={{ fontSize: 40, fontWeight: 700, color: '#F1F5F9', lineHeight: 1 }}>$49</span>
-                <span style={{ fontSize: 14, color: '#64748B', marginLeft: 4 }}>USD/mes</span>
+                <span style={{ fontSize: 28, fontWeight: 700, color: '#F1F5F9', lineHeight: 1 }}>$49.900</span>
+                <span style={{ fontSize: 14, color: '#64748B', marginLeft: 4 }}>ARS/mes</span>
               </div>
               
               <div style={{ borderBottom: '0.5px solid #334155', margin: '16px 0' }}></div>
@@ -211,7 +216,8 @@ export default function PricingPage() {
               {[
                 'Hasta 5 cámaras con Edge AI',
                 'Sellado inmutable ilimitado en Avalanche L1',
-                'Disputas Genlayer on-demand (+$20 c/u)',
+                'Video sellado en IPFS automáticamente',
+                '3 análisis Claude Vision por mes',
                 'Retención de datos 30 días',
                 'Soporte por email'
               ].map(f => (
@@ -233,7 +239,7 @@ export default function PricingPage() {
             </div>
 
             <button
-              onClick={() => router.push('/checkout?plan=pyme&precio=49')}
+              onClick={() => router.push('/checkout?plan=pyme&precio=49900')}
               style={{
                 marginTop: 'auto',
                 background: '#2563EB',
@@ -289,8 +295,8 @@ export default function PricingPage() {
               </p>
               
               <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                <span style={{ fontSize: 40, fontWeight: 700, color: '#2563EB', lineHeight: 1 }}>$149</span>
-                <span style={{ fontSize: 14, color: '#64748B', marginLeft: 4 }}>USD/mes</span>
+                <span style={{ fontSize: 28, fontWeight: 700, color: '#2563EB', lineHeight: 1 }}>$99.900</span>
+                <span style={{ fontSize: 14, color: '#64748B', marginLeft: 4 }}>ARS/mes</span>
               </div>
               
               <div style={{ borderBottom: '0.5px solid #334155', margin: '16px 0' }}></div>
@@ -301,7 +307,7 @@ export default function PricingPage() {
                 'Hasta 20 cámaras con Edge AI',
                 'Sellado L1 ilimitado',
                 'Módulo logístico completo (remitos + stock)',
-                '5 peritajes Genlayer GRATIS al mes',
+                '20 análisis Claude Vision por mes',
                 'Retención 90 días',
                 '3 usuarios administradores',
                 'Soporte prioritario'
@@ -324,7 +330,7 @@ export default function PricingPage() {
             </div>
 
             <button
-              onClick={() => router.push('/checkout?plan=pro&precio=149')}
+              onClick={() => router.push('/checkout?plan=pro&precio=99900')}
               style={{
                 marginTop: 'auto',
                 background: '#2563EB',
@@ -375,8 +381,8 @@ export default function PricingPage() {
               </p>
               
               <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                <span style={{ fontSize: 32, fontWeight: 700, color: '#06B6D4', lineHeight: 1 }}>Desde $499</span>
-                <span style={{ fontSize: 14, color: '#64748B', marginLeft: 4 }}>USD/mes</span>
+                <span style={{ fontSize: 26, fontWeight: 700, color: '#06B6D4', lineHeight: 1 }}>Desde $299.900</span>
+                <span style={{ fontSize: 14, color: '#64748B', marginLeft: 4 }}>ARS/mes</span>
               </div>
               <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>· Precio a negociar</div>
               
@@ -389,7 +395,7 @@ export default function PricingPage() {
                 'Nodo Avalanche validador propio',
                 'IA entrenada a medida de tu operación',
                 'Integración API con SAP / Tango',
-                'Genlayer ilimitado',
+                'Análisis Claude Vision ilimitado',
                 'SLA garantizado',
                 'Gerente de cuenta dedicado'
               ].map(f => (

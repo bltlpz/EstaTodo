@@ -13,9 +13,9 @@ class CreatePreferenceRequest(BaseModel):
     empresa: str
 
 PLANES = {
-    "starter": {"nombre": "SafeGuard Starter", "precio": 299},
-    "pro": {"nombre": "SafeGuard Pro", "precio": 799},
-    "enterprise": {"nombre": "SafeGuard Enterprise", "precio": 1999},
+    "starter": {"nombre": "SafeGuard Starter", "precio": 29900},
+    "pro": {"nombre": "SafeGuard Pro", "precio": 79900},
+    "enterprise": {"nombre": "SafeGuard Enterprise", "precio": 199900},
 }
 
 @router.post("/create-preference")
@@ -30,7 +30,7 @@ async def create_preference(data: CreatePreferenceRequest):
                 "title": plan["nombre"],
                 "quantity": 1,
                 "unit_price": float(plan["precio"]),
-                "currency_id": "USD",
+                "currency_id": "ARS",
             }
         ],
         "payer": {

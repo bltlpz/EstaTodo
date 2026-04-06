@@ -67,7 +67,9 @@ def _to_ws_payload(db_event: Event) -> dict[str, Any]:
         "confidence": db_event.confidence,
         "metadata": db_event.event_metadata or {},
         "module": db_event.module or "CARGO",
-        "genlayer_verdict": db_event.genlayer_verdict,
+        # genlayer_verdict se reutiliza en DB pero se expone como vision_verdict
+        "vision_verdict": db_event.genlayer_verdict,
+        "genlayer_verdict": db_event.genlayer_verdict,  # alias de compatibilidad
         "incident_description": db_event.incident_description,
         "ipfs_cid": db_event.ipfs_cid,
         "ipfs_url": db_event.ipfs_url,

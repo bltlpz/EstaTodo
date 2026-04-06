@@ -22,6 +22,9 @@ export interface SGEvent {
   confidence: number;
   metadata: Record<string, any> | null;
   module: string;
+  /** Nuevo campo: veredicto de Claude Vision */
+  vision_verdict: string | null;
+  /** Alias de compatibilidad — mismo valor que vision_verdict */
   genlayer_verdict: string | null;
   incident_description: string | null;
   ipfs_cid: string | null;
@@ -122,11 +125,13 @@ export function getStatusBadge(status: string): string {
 
 export function getVerdictBadge(verdict: string | null): string {
   if (!verdict) return 'badge badge-gray';
-  if (verdict === 'ROBO_CONFIRMADO') return 'badge badge-red';
+  // Claude Vision veredictos nuevos
+  if (verdict === 'CONFIRMADO') return 'badge badge-red';
   if (verdict === 'FALSA_ALARMA') return 'badge badge-green';
   if (verdict === 'REQUIERE_REVISION') return 'badge badge-amber';
-  // Legacy fallback
-  if (verdict.includes('FRAUDE') || verdict.includes('ROBO')) return 'badge badge-red';
+  // Legacy (compatibilidad con datos anteriores)
+  if (verdict === 'ROBO_CONFIRMADO') return 'badge badge-red';
+  if (verdict.includes('FRAUDE') || verdict.includes('ROBO') || verdict.includes('CONFIRMADO')) return 'badge badge-red';
   if (verdict.includes('REAL') || verdict.includes('ALARMA')) return 'badge badge-green';
   return 'badge badge-amber';
 }

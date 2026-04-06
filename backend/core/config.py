@@ -47,9 +47,8 @@ class Settings(BaseSettings):
     PINATA_JWT: str = ""  # vacío = IPFS deshabilitado
     PINATA_GATEWAY: str = "https://gateway.pinata.cloud/ipfs"
 
-    # Genlayer
-    GENLAYER_SIMULATOR_URL: str = ""  # vacío = modo mock
-    GENLAYER_CONTRACT_ADDRESS: str = ""
+    # Claude Vision (Anthropic)
+    ANTHROPIC_API_KEY: str = ""  # vacío = modo mock determinístico
 
     # Supabase (Auth/DB)
     next_public_supabase_url: str = ""
