@@ -475,6 +475,18 @@ export default function PricingPage() {
           </div>
         </div>
 
+        {/* MEDIOS DE PAGO */}
+        <div style={{ marginTop: 40, textAlign: 'center', background: '#1E293B', padding: '24px', borderRadius: 16, border: '0.5px solid #334155', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
+          <h3 style={{ fontSize: 16, color: '#F1F5F9', marginBottom: 16, fontFamily: 'var(--font-space), system-ui' }}>Todos los medios de pago aceptados a través de Mercado Pago</h3>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap', color: '#CBD5E1', fontSize: 13, fontWeight: 500 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>💳 Tarjeta de Crédito (hasta 12 cuotas)</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>💳 Tarjeta de Débito</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>🏦 Transferencia Bancaria (CBU/CVU)</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>📱 Dinero en Mercado Pago</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>💵 Efectivo (Rapipago / Pago Fácil)</span>
+          </div>
+        </div>
+
         {/* FAQ COLAPSABLE */}
         <div style={{ marginTop: 48, maxWidth: 800, margin: '48px auto 0' }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, color: '#F1F5F9', textAlign: 'center', marginBottom: 20, fontFamily: 'var(--font-space), system-ui' }}>

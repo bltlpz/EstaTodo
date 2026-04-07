@@ -25,7 +25,7 @@ function CheckoutContent() {
   const handlePay = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://5695-200-80-213-210.ngrok-free.app'}/api/payments/create-preference`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://5695-200-80-213-210.ngrok-free.app'}/api/payments/create-subscription`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -35,8 +35,10 @@ function CheckoutContent() {
         })
       })
       const data = await res.json()
-      // Usar sandbox_init_point para testing
-      window.location.href = data.sandbox_init_point
+      if (data.subscription_id) {
+        localStorage.setItem('estatodo_subscription_id', data.subscription_id);
+      }
+      window.location.href = data.init_point
     } catch (err) {
       console.error(err)
     } finally {

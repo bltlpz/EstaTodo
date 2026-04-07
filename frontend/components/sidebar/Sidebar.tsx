@@ -20,6 +20,12 @@ const NAV = [
       { label: 'Eventos', href: '/events', icon: '⚠' },
     ],
   },
+  {
+    group: 'CUENTA',
+    items: [
+      { label: 'Facturación / Plan', href: '/billing', icon: '💳' },
+    ],
+  },
 ];
 
 type Tenant = { empresa: string; email: string; plan: 'trial' | 'pro' | 'enterprise' };
